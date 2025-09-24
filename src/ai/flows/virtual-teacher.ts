@@ -54,10 +54,71 @@ export async function chatWithVirtualTeacher(input: ChatWithVirtualTeacherInput)
   return virtualTeacherFlow(input);
 }
 
+
+// Mock tool for solving equations
+const solveEquationTool = ai.defineTool(
+  {
+    name: 'solveEquation',
+    description: 'Solves a mathematical equation. Use this for any kind of equation.',
+    inputSchema: z.object({
+      equation: z.string().describe('The equation to solve. e.g., "2x + 5 = 15"'),
+    }),
+    outputSchema: z.object({
+      solution: z.string().describe('The solution to the equation. e.g., "x = 5"'),
+    }),
+  },
+  async ({ equation }) => {
+    // In a real application, you would use a math library like math.js
+    // For this example, we'll just mock a response.
+    console.log(`Solving equation: ${equation}`);
+    // A real implementation would parse and solve the equation.
+    // This is a simplified mock.
+    if (equation.includes('2x + 5 = 15')) {
+      return { solution: 'x = 5' };
+    } else if (equation.includes('x^2 - 4 = 0')) {
+      return { solution: 'x = 2 or x = -2' };
+    }
+    return { solution: 'Could not solve the equation (this is a mock response).' };
+  }
+);
+
+// Mock tool for plotting diagrams
+const plotDiagramTool = ai.defineTool(
+    {
+        name: 'plotDiagram',
+        description: 'Plots a diagram for a mathematical function. Use this to visualize equations.',
+        inputSchema: z.object({
+            func: z.string().describe('The function to plot, e.g., "y = 2x + 1"'),
+        }),
+        outputSchema: z.object({
+            chartData: z.array(z.object({ name: z.string(), value: z.number() })).describe('The data points for the diagram.'),
+        }),
+    },
+    async ({ func }) => {
+        // In a real application, you would parse the function and generate points.
+        // This is a simplified mock.
+        console.log(`Plotting function: ${func}`);
+        const data = [];
+        for (let i = -5; i <= 5; i++) {
+            // Mock evaluation of '2*x + 1'
+             if (func.includes('2x + 1') || func.includes('2*x+1')) {
+                data.push({ name: `${i}`, value: 2 * i + 1 });
+            } else if (func.includes('x^2')) {
+                data.push({ name: `${i}`, value: i * i });
+            } else {
+                 data.push({ name: `${i}`, value: Math.sin(i) * 5 }); // Default to something visual
+            }
+        }
+        return { chartData: data };
+    }
+);
+
+
 const prompt = ai.definePrompt({
   name: 'virtualTeacherPrompt',
   input: {schema: ChatWithVirtualTeacherInputSchema},
   output: {schema: ChatWithVirtualTeacherOutputSchema},
+  tools: [solveEquationTool, plotDiagramTool],
   prompt: `You are a friendly and engaging AI virtual teacher for Iranian high school students. You are teaching in Persian.
 Your expertise is in {{{subject}}}.
 
@@ -72,10 +133,14 @@ To make your explanations more professional and easier to understand, you MUST u
 - Use tables to compare and contrast concepts, show data, or list steps.
 - Use bar charts to visualize data and relationships. Make sure chart data is simple and clear.
 
+**IMPORTANT CAPABILITIES**:
+- **Equation Solving**: If the student asks you to solve a mathematical equation, you MUST use the \`solveEquation\` tool.
+- **Diagram Plotting**: If the student asks for a diagram or plot of a function, you MUST use the \`plotDiagram\` tool and then render the result as a 'chart' type in your response.
+
 Your response will be an array of content blocks. For example:
 [
   { "type": "text", "content": "Here is an explanation..." },
-  { "type": "table", "caption": "Comparison of A and B", "headers": ["Feature", "A", "B"], "rows": [["Speed", "Fast", "Slow"]] },
+  { "type":a "table", "caption": "Comparison of A and B", "headers": ["Feature", "A", "B"], "rows": [["Speed", "Fast", "Slow"]] },
   { "type": "chart", "caption": "Growth over time", "data": [{ "name": "Jan", "value": 10 }, { "name": "Feb", "value": 20 }] }
 ]
 
@@ -124,3 +189,5 @@ const virtualTeacherFlow = ai.defineFlow(
     return output!;
   }
 );
+
+    
