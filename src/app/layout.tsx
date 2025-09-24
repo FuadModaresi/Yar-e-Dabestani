@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { GlossaryProvider } from '@/hooks/use-glossary';
+import { UserProvider } from '@/hooks/use-user';
 import MainLayout from '@/components/layout/main-layout';
 
 export const metadata: Metadata = {
@@ -29,10 +30,12 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <GlossaryProvider>
-          <MainLayout>{children}</MainLayout>
-          <Toaster />
-        </GlossaryProvider>
+        <UserProvider>
+          <GlossaryProvider>
+            <MainLayout>{children}</MainLayout>
+            <Toaster />
+          </GlossaryProvider>
+        </UserProvider>
       </body>
     </html>
   );

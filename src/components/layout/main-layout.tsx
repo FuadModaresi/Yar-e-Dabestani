@@ -9,10 +9,26 @@ import {
 } from '@/components/ui/sidebar';
 import SidebarNav from './sidebar-nav';
 import SiteHeader from './site-header';
+import { usePathname } from 'next/navigation';
+import { useUser } from '@/hooks/use-user';
+
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  // We manage the sidebar open state here to persist it across page navigations.
   const [open, setOpen] = React.useState(true);
+  const pathname = usePathname();
+  const { user, loading } = useUser();
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <>{children}</>;
+  }
 
   return (
     <SidebarProvider open={open} onOpenChange={setOpen} defaultOpen={true}>
