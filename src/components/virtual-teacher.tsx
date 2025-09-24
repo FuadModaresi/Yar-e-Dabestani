@@ -5,14 +5,84 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Bot, Loader2, Send, User, Paperclip, X, Image as ImageIcon } from 'lucide-react';
-import { chatWithVirtualTeacher } from '@/ai/flows/virtual-teacher';
+import { chatWithVirtualTeacher, ChatWithVirtualTeacherOutput } from '@/ai/flows/virtual-teacher';
 import Image from 'next/image';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableCaption,
+} from '@/components/ui/table';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis } from 'recharts';
+
+
+type MessageContent = ChatWithVirtualTeacherOutput['response'][number];
 
 type Message = {
   role: 'user' | 'bot';
   content: string;
+  richContent?: MessageContent[];
   image?: string;
 };
+
+const renderContent = (item: MessageContent, index: number) => {
+    switch (item.type) {
+        case 'text':
+            return <p key={index} className="whitespace-pre-wrap">{item.content}</p>;
+        case 'table':
+            return (
+                <Table key={index} className="my-4 bg-background/50 rounded-lg">
+                    {item.caption && <TableCaption>{item.caption}</TableCaption>}
+                    <TableHeader>
+                        <TableRow>
+                            {item.headers.map((header, hIndex) => <TableHead key={hIndex}>{header}</TableHead>)}
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {item.rows.map((row, rIndex) => (
+                            <TableRow key={rIndex}>
+                                {row.map((cell, cIndex) => <TableCell key={cIndex}>{cell}</TableCell>)}
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            );
+        case 'chart':
+            const chartConfig = item.data.reduce((acc, bar) => {
+                acc[bar.name] = { label: bar.name };
+                return acc;
+            }, {} as any);
+            return (
+                <Card key={index} className="my-4">
+                    <CardHeader>
+                        {item.caption && <CardTitle>{item.caption}</CardTitle>}
+                    </CardHeader>
+                    <CardContent>
+                        <ChartContainer config={chartConfig} className="h-[200px] w-full">
+                            <BarChart accessibilityLayer data={item.data}>
+                                <CartesianGrid vertical={false} />
+                                <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
+                                <YAxis />
+                                <ChartTooltip content={<ChartTooltipContent />} />
+                                <Bar dataKey="value" fill="var(--color-primary)" radius={4} />
+                            </BarChart>
+                        </ChartContainer>
+                    </CardContent>
+                </Card>
+            );
+        default:
+            return null;
+    }
+}
+
 
 export default function VirtualTeacher({ subject }: { subject: { id: string; name: string } }) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -65,7 +135,7 @@ export default function VirtualTeacher({ subject }: { subject: { id: string; nam
         message: messageToSend,
         imageDataUri: imageToSend || undefined,
       });
-      const botMessage: Message = { role: 'bot', content: result.response };
+      const botMessage: Message = { role: 'bot', content: '', richContent: result.response };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error('Error chatting with virtual teacher:', error);
@@ -112,7 +182,8 @@ export default function VirtualTeacher({ subject }: { subject: { id: string; nam
               {message.image && (
                 <Image src={message.image} alt="Uploaded content" width={300} height={200} className="rounded-md mb-2" />
               )}
-              <p className="whitespace-pre-wrap">{message.content}</p>
+               {message.content && <p className="whitespace-pre-wrap">{message.content}</p>}
+               {message.richContent && message.richContent.map((contentItem, contentIndex) => renderContent(contentItem, contentIndex))}
             </div>
             {message.role === 'user' && (
                 <div className="p-2 bg-accent/20 rounded-full text-accent-foreground flex-shrink-0">
