@@ -44,41 +44,16 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const session = localStorage.getItem('mock-session');
-    if (session) {
-      setUser(mockUser);
-    }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    if (!loading && !user && pathname !== '/login') {
-      router.push('/login');
-    }
-     if (!loading && user && pathname === '/login') {
-      router.push('/');
-    }
-  }, [user, loading, router, pathname]);
-
+  const [user, setUser] = useState<User | null>(mockUser);
+  const [loading, setLoading] = useState(false);
+  
   const logout = () => {
-    localStorage.removeItem('mock-session');
-    setUser(null);
-    router.push('/login');
+    // No-op for now
   }
 
   return (
     <UserContext.Provider value={{ user, loading, logout }}>
-      {loading ? (
-          <div className="flex h-screen w-full items-center justify-center">
-            Loading...
-          </div>
-        ) : children}
+      {children}
     </UserContext.Provider>
   );
 }

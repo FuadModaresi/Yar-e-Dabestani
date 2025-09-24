@@ -9,25 +9,20 @@ import {
 } from '@/components/ui/sidebar';
 import SidebarNav from './sidebar-nav';
 import SiteHeader from './site-header';
-import { usePathname } from 'next/navigation';
 import { useUser } from '@/hooks/use-user';
 
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(true);
-  const pathname = usePathname();
-  const { user, loading } = useUser();
-
-  if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
+  const { user } = useUser();
 
   if (!user) {
-    return <>{children}</>;
+    // This can be a loading spinner or some other placeholder
+    return (
+        <div className="flex h-screen w-full items-center justify-center">
+            Loading user...
+        </div>
+    );
   }
 
   return (

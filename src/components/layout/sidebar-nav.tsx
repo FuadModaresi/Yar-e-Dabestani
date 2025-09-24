@@ -10,10 +10,8 @@ import {
 } from '@/components/ui/sidebar';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Home, Atom, Variable, FlaskConical, Calculator, BookCopy, LogOut } from 'lucide-react';
+import { Home, Atom, Variable, FlaskConical, Calculator, BookCopy } from 'lucide-react';
 import { subjects } from '@/lib/data';
-import { useUser } from '@/hooks/use-user';
-import { Button } from '../ui/button';
 
 const subjectIcons = {
   physics: Atom,
@@ -24,8 +22,6 @@ const subjectIcons = {
 
 export default function SidebarNav() {
   const pathname = usePathname();
-  const { logout } = useUser();
-
 
   const isActive = (path: string) => {
     return pathname === path || (path !== '/' && pathname.startsWith(path));
@@ -88,12 +84,7 @@ export default function SidebarNav() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter className="p-4 mt-auto">
-        <Button onClick={logout} variant="ghost">
-            <LogOut />
-            <span>خروج</span>
-        </Button>
-      </SidebarFooter>
+      <SidebarFooter className="p-4 mt-auto" />
     </>
   );
 }
