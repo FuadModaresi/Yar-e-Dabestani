@@ -11,14 +11,14 @@ import {
 } from '@/components/ui/sidebar';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Home, Atom, Variable, FlaskConical, Calculator, BookCopy } from 'lucide-react';
+import { Home, Atom, Dna, FlaskConical, Calculator, BookCopy } from 'lucide-react';
 import { subjects } from '@/lib/data';
 
 const subjectIcons = {
   physics: Atom,
   math: Calculator,
   chemistry: FlaskConical,
-  biology: Variable,
+  biology: Dna,
 };
 
 export default function SidebarNav() {
