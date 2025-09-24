@@ -8,6 +8,7 @@ import MainLayout from '@/components/layout/main-layout';
 export const metadata: Metadata = {
   title: 'یار دبستانی من',
   description: 'پلتفرم آموزشی برای دانش‌آموزان دبیرستانی ایران',
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

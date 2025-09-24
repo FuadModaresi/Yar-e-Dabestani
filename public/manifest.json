@@ -1,0 +1,21 @@
+{
+  "name": "یار دبستانی من",
+  "short_name": "یار دبستانی",
+  "description": "پلتفرم آموزشی برای دانش‌آموزان دبیرستانی ایران",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#E8F0FE",
+  "theme_color": "#6789B2",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
