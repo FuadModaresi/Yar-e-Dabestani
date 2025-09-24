@@ -27,11 +27,11 @@ export default function Home() {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">45%</div>
+            <div className="text-2xl font-bold">0%</div>
             <p className="text-xs text-muted-foreground">
-              +10% نسبت به ماه گذشته
+              شروع به یادگیری کنید!
             </p>
-            <Progress value={45} className="mt-4 h-2" />
+            <Progress value={0} className="mt-4 h-2" />
           </CardContent>
         </Card>
         <Card>
@@ -40,40 +40,50 @@ export default function Home() {
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12 از 27</div>
+            <div className="text-2xl font-bold">0 از 0</div>
             <p className="text-xs text-muted-foreground">
-              به یادگیری ادامه دهید!
+              هنوز درسی تکمیل نشده است.
             </p>
-             <Progress value={(12/27) * 100} className="mt-4 h-2" />
+             <Progress value={0} className="mt-4 h-2" />
           </CardContent>
         </Card>
       </div>
 
       <div>
         <h2 className="text-2xl font-bold tracking-tight">موضوعات</h2>
-        <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {subjects.map((subject) => (
-            <Link href={`/subjects/${subject.id}`} key={subject.id}>
-              <Card className="group h-full transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <CardHeader className="flex flex-row items-center gap-4">
-                  <div className="rounded-lg bg-primary/10 p-3 text-primary">
-                    <subject.icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <CardTitle>{subject.name}</CardTitle>
-                    <CardDescription>
-                      {subject.lessons.length} درس
-                    </CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    {subject.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+        <div className="mt-4">
+          {subjects.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {subjects.map((subject) => (
+                    <Link href={`/subjects/${subject.id}`} key={subject.id}>
+                    <Card className="group h-full transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <CardHeader className="flex flex-row items-center gap-4">
+                        <div className="rounded-lg bg-primary/10 p-3 text-primary">
+                            <subject.icon className="h-6 w-6" />
+                        </div>
+                        <div>
+                            <CardTitle>{subject.name}</CardTitle>
+                            <CardDescription>
+                            {subject.lessons.length} درس
+                            </CardDescription>
+                        </div>
+                        </CardHeader>
+                        <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                            {subject.description}
+                        </p>
+                        </CardContent>
+                    </Card>
+                    </Link>
+                ))}
+            </div>
+            ) : (
+            <div className="flex h-48 items-center justify-center rounded-lg border-2 border-dashed">
+                <p className="text-muted-foreground">
+                در حال حاضر موضوعی برای نمایش وجود ندارد.
+                </p>
+            </div>
+            )}
         </div>
       </div>
     </div>

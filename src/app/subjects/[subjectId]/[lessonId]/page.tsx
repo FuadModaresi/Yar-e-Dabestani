@@ -139,9 +139,11 @@ export default function LessonPage({ params }: { params: { subjectId: string; le
                 </div>
             </article>
 
-            <section className="mt-12">
-                <Quiz lesson={lesson} subject={subject} />
-            </section>
+            {lesson.quiz && lesson.quiz.length > 0 && (
+                <section className="mt-12">
+                    <Quiz lesson={lesson} subject={subject} />
+                </section>
+            )}
         </div>
     );
 }
