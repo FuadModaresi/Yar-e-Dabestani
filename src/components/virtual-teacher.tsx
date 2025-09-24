@@ -235,6 +235,7 @@ export default function VirtualTeacher({ subject }: { subject: { id: string; nam
             }}
             className="pr-28"
             disabled={isLoading}
+            suppressHydrationWarning
           />
           <div className="absolute left-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
             <input
