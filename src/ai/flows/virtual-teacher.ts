@@ -29,7 +29,7 @@ const TableContentSchema = z.object({
     type: z.enum(['table']),
     caption: z.string().optional(),
     headers: z.array(z.string()),
-    rows: z.array(z.array(string())),
+    rows: z.array(z.array(z.string())),
 });
 
 const ChartContentSchema = z.object({
