@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Bot, Loader2, Send, User, Paperclip, X, Image as ImageIcon } from 'lucide-react';
+import { Bot, Loader2, Send, User, Paperclip, X, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { chatWithVirtualTeacher, ChatWithVirtualTeacherOutput } from '@/ai/flows/virtual-teacher';
 import Image from 'next/image';
 import {
@@ -22,6 +22,17 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 
 type MessageContent = ChatWithVirtualTeacherOutput['response'][number];
@@ -92,14 +103,36 @@ export default function VirtualTeacher({ subject }: { subject: { id: string; nam
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const storageKey = `conversation_history_${subject.id}`;
+
+  useEffect(() => {
+    try {
+        const savedMessages = localStorage.getItem(storageKey);
+        if (savedMessages) {
+            setMessages(JSON.parse(savedMessages));
+        }
+    } catch (error) {
+        console.error("Failed to load messages from localStorage", error);
+    }
+  }, [storageKey]);
+
+  useEffect(() => {
+    try {
+        if (messages.length > 0) {
+            localStorage.setItem(storageKey, JSON.stringify(messages));
+        } else {
+            localStorage.removeItem(storageKey);
+        }
+    } catch (error) {
+        console.error("Failed to save messages to localStorage", error);
+    }
+    scrollToBottom();
+  }, [messages, storageKey]);
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
   
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -149,14 +182,39 @@ export default function VirtualTeacher({ subject }: { subject: { id: string; nam
     }
   };
 
+  const handleClearHistory = () => {
+    setMessages([]);
+  };
+
   return (
     <Card className="h-[75vh] flex flex-col">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-            <Bot />
-            معلم خصوصی هوش مصنوعی - {subject.name}
-        </CardTitle>
-        <CardDescription>هر سوالی در مورد {subject.name} دارید بپرسید. می‌توانید تصویر هم ارسال کنید.</CardDescription>
+      <CardHeader className="flex flex-row justify-between items-center">
+        <div>
+            <CardTitle className="flex items-center gap-2">
+                <Bot />
+                معلم خصوصی هوش مصنوعی - {subject.name}
+            </CardTitle>
+            <CardDescription>هر سوالی در مورد {subject.name} دارید بپرسید. می‌توانید تصویر هم ارسال کنید.</CardDescription>
+        </div>
+        <AlertDialog>
+            <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="icon" disabled={messages.length === 0}>
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>پاک کردن تاریخچه گفتگو</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        آیا مطمئن هستید که می‌خواهید تمام پیام‌های این گفتگو را پاک کنید؟ این عمل غیرقابل بازگشت است.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>انصراف</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleClearHistory}>پاک کردن</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
       </CardHeader>
       <CardContent className="flex-grow overflow-y-auto space-y-4 pr-2">
         {messages.length === 0 && (
