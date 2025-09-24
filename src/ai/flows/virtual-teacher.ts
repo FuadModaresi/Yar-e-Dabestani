@@ -21,19 +21,19 @@ const ChatWithVirtualTeacherInputSchema = z.object({
 export type ChatWithVirtualTeacherInput = z.infer<typeof ChatWithVirtualTeacherInputSchema>;
 
 const TextContentSchema = z.object({
-  type: z.literal('text'),
+  type: z.enum(['text']),
   content: z.string(),
 });
 
 const TableContentSchema = z.object({
-    type: z.literal('table'),
+    type: z.enum(['table']),
     caption: z.string().optional(),
     headers: z.array(z.string()),
     rows: z.array(z.array(z.string())),
 });
 
 const ChartContentSchema = z.object({
-    type: z.literal('chart'),
+    type: z.enum(['chart']),
     caption: z.string().optional(),
     data: z.array(z.object({ name: z.string(), value: z.number() })),
 });
