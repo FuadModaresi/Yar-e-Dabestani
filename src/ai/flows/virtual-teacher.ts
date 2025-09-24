@@ -29,7 +29,7 @@ const TableContentSchema = z.object({
     type: z.enum(['table']),
     caption: z.string().optional(),
     headers: z.array(z.string()),
-    rows: z.array(z.array(z.string())),
+    rows: z.array(z.array(string())),
 });
 
 const ChartContentSchema = z.object({
@@ -99,14 +99,22 @@ const plotDiagramTool = ai.defineTool(
         // This is a simplified mock.
         console.log(`Plotting function: ${func}`);
         const data = [];
-        for (let i = -5; i <= 5; i++) {
-            // Mock evaluation of '2*x + 1'
-             if (func.includes('2x + 1') || func.includes('2*x+1')) {
+        // Support for more functions for better mock
+        if (func.includes('-3*(x+2)^2+4') || func.includes('-3(x+2)^2+4')) {
+             for (let i = -7; i <= 3; i++) {
+                data.push({ name: `${i}`, value: -3 * Math.pow(i + 2, 2) + 4 });
+            }
+        } else if (func.includes('2x + 1') || func.includes('2*x+1')) {
+             for (let i = -5; i <= 5; i++) {
                 data.push({ name: `${i}`, value: 2 * i + 1 });
-            } else if (func.includes('x^2')) {
+            }
+        } else if (func.includes('x^2')) {
+             for (let i = -5; i <= 5; i++) {
                 data.push({ name: `${i}`, value: i * i });
-            } else {
-                 data.push({ name: `${i}`, value: Math.sin(i) * 5 }); // Default to something visual
+            }
+        } else {
+             for (let i = -5; i <= 5; i++) {
+                data.push({ name: `${i}`, value: Math.sin(i) * 5 }); // Default to something visual
             }
         }
         return { chartData: data };
@@ -134,17 +142,17 @@ To make your explanations more professional and easier to understand, you MUST u
 - Use bar charts to visualize data and relationships. Make sure chart data is simple and clear.
 
 **IMPORTANT CAPABILITIES**:
-- **Equation Solving**: If the student asks you to solve a mathematical equation, you MUST use the \`solveEquation\` tool.
-- **Diagram Plotting**: If the student asks for a diagram or plot of a function, you MUST use the \`plotDiagram\` tool and then render the result as a 'chart' type in your response.
+- **Equation Solving**: If the student asks you to solve a mathematical equation, you MUST use the \`solveEquation\` tool. The result from the tool should be presented to the user in a text block.
+- **Diagram Plotting**: If the student asks for a diagram or plot of a function, you MUST use the \`plotDiagram\` tool. After calling the tool, you MUST use the \`chartData\` returned by the tool to create a \`chart\` content item in your response. DO NOT just describe the chart in text; you must output the chart object.
 
 Your response will be an array of content blocks. For example:
 [
   { "type": "text", "content": "Here is an explanation..." },
-  { "type":a "table", "caption": "Comparison of A and B", "headers": ["Feature", "A", "B"], "rows": [["Speed", "Fast", "Slow"]] },
-  { "type": "chart", "caption": "Growth over time", "data": [{ "name": "Jan", "value": 10 }, { "name": "Feb", "value": 20 }] }
+  { "type": "table", "caption": "Comparison of A and B", "headers": ["Feature", "A", "B"], "rows": [["Speed", "Fast", "Slow"]] },
+  { "type": "chart", "caption": "Plot of y = x^2", "data": [{ "name": "-2", "value": 4 }, { "name": "-1", "value": 1 }, { "name": "0", "value": 0 }] }
 ]
 
-Always start with a text block.
+Always start with a text block to introduce the topic, then you can follow with other content types like charts or tables.
 
 Student's message:
 "{{{message}}}"
@@ -189,5 +197,3 @@ const virtualTeacherFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    
