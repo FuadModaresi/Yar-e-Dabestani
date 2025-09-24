@@ -14,6 +14,9 @@ import {z} from 'genkit';
 const ChatWithVirtualTeacherInputSchema = z.object({
   subject: z.string().describe('The subject the student wants to discuss (e.g., physics, math, chemistry, biology).'),
   message: z.string().describe("The student's message to the virtual teacher."),
+  imageDataUri: z.string().optional().describe(
+    "An optional image sent by the student, as a data URI. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+  ),
 });
 export type ChatWithVirtualTeacherInput = z.infer<typeof ChatWithVirtualTeacherInputSchema>;
 
@@ -38,8 +41,15 @@ Keep your responses concise, easy to understand for a high schooler, and encoura
 
 Do not solve homework problems directly, but guide the student to the solution.
 
+If the user has provided an image, analyze it in the context of their question. The image could be of their homework, a diagram, or something they need help identifying.
+
 Student's message:
 "{{{message}}}"
+
+{{#if imageDataUri}}
+[Image provided by student]
+{{media url=imageDataUri}}
+{{/if}}
 
 Your response should be in Persian.
 `,
