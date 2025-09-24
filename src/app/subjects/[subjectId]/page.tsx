@@ -6,10 +6,11 @@ import {
   CardTitle,
   CardDescription,
   CardFooter,
+  CardContent,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Bot } from 'lucide-react';
 
 export async function generateStaticParams() {
   return subjects.map((subject) => ({
@@ -40,6 +41,26 @@ export default function SubjectPage({
         </div>
       </div>
 
+      <Card className="bg-gradient-to-br from-primary/10 to-accent/10">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bot />
+            معلم خصوصی هوش مصنوعی
+          </CardTitle>
+          <CardDescription>
+            یک سؤال بپرسید یا یک گفتگو با معلم خصوصی هوش مصنوعی خود برای {subject.name} شروع کنید.
+          </CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Button asChild>
+            <Link href={`/subjects/${subject.id}/conversation`}>
+              شروع گفتگو
+              <ArrowLeft className="mr-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </CardFooter>
+      </Card>
+
       <div className="space-y-4">
         <h2 className="text-2xl font-bold tracking-tight">درس ها</h2>
         {subject.lessons.length > 0 ? (
@@ -64,8 +85,8 @@ export default function SubjectPage({
             ))}
           </div>
         ) : (
-          <div className="flex h-48 items-center justify-center rounded-lg border-2 border-dashed">
-            <p className="text-muted-foreground">
+          <div className="flex h-48 flex-col items-center justify-center rounded-lg border-2 border-dashed">
+             <p className="text-muted-foreground">
               در حال حاضر درسی برای این موضوع وجود ندارد.
             </p>
           </div>
