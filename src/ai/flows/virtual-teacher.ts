@@ -38,15 +38,23 @@ const ChartContentSchema = z.object({
     data: z.array(z.object({ name: z.string(), value: z.number() })),
 });
 
+const ImageUrlContentSchema = z.object({
+    type: z.enum(['imageUrl']),
+    url: z.string().url(),
+    alt: z.string().optional(),
+});
+
+
 const ContentItemSchema = z.union([
     TextContentSchema,
     TableContentSchema,
     ChartContentSchema,
+    ImageUrlContentSchema,
 ]);
 
 
 const ChatWithVirtualTeacherOutputSchema = z.object({
-  response: z.array(ContentItemSchema).describe("The virtual teacher's response to the student, which can include text, tables, and charts."),
+  response: z.array(ContentItemSchema).describe("The virtual teacher's response to the student, which can include text, tables, charts, and images."),
 });
 export type ChatWithVirtualTeacherOutput = z.infer<typeof ChatWithVirtualTeacherOutputSchema>;
 
@@ -82,42 +90,58 @@ const solveEquationTool = ai.defineTool(
   }
 );
 
-// Mock tool for plotting diagrams
-const plotDiagramTool = ai.defineTool(
+// Tool for plotting diagrams using quickchart.io
+const plotDiagramWithQuickChart = ai.defineTool(
     {
         name: 'plotDiagram',
-        description: 'Plots a diagram for a mathematical function. Use this to visualize equations.',
+        description: 'Generates a URL for a chart visualizing a mathematical function. Use this to visualize equations.',
         inputSchema: z.object({
             func: z.string().describe('The function to plot, e.g., "y = 2x + 1"'),
+            title: z.string().describe('The title for the chart.'),
         }),
         outputSchema: z.object({
-            chartData: z.array(z.object({ name: z.string(), value: z.number() })).describe('The data points for the diagram.'),
+            chartUrl: z.string().url().describe('The URL of the generated chart image.'),
         }),
     },
-    async ({ func }) => {
-        // In a real application, you would parse the function and generate points.
-        // This is a simplified mock.
-        console.log(`Plotting function: ${func}`);
-        const data = [];
-        // Support for more functions for better mock
-        if (func.includes('-3*(x+2)^2+4') || func.includes('-3(x+2)^2+4')) {
-             for (let i = -7; i <= 3; i++) {
-                data.push({ name: `${i}`, value: -3 * Math.pow(i + 2, 2) + 4 });
-            }
-        } else if (func.includes('2x + 1') || func.includes('2*x+1')) {
-             for (let i = -5; i <= 5; i++) {
-                data.push({ name: `${i}`, value: 2 * i + 1 });
-            }
-        } else if (func.includes('x^2')) {
-             for (let i = -5; i <= 5; i++) {
-                data.push({ name: `${i}`, value: i * i });
-            }
-        } else {
-             for (let i = -5; i <= 5; i++) {
-                data.push({ name: `${i}`, value: Math.sin(i) * 5 }); // Default to something visual
+    async ({ func, title }) => {
+        console.log(`Plotting function: ${func} with title: ${title}`);
+        
+        const dataPoints = [];
+        const xValues = Array.from({length: 21}, (_, i) => i - 10); // x from -10 to 10
+        
+        for (const x of xValues) {
+            try {
+                // This is a safe-ish eval, but in a real app, a proper math parser is better
+                const y = eval(func.replace(/x/g, `(${x})`).replace('^', '**'));
+                dataPoints.push({ x, y });
+            } catch (e) {
+                console.error(`Error evaluating function '${func}' for x=${x}:`, e);
             }
         }
-        return { chartData: data };
+        
+        const chartConfig = {
+            type: 'line',
+            data: {
+                labels: dataPoints.map(p => p.x),
+                datasets: [{
+                    label: func,
+                    data: dataPoints.map(p => p.y),
+                    fill: false,
+                    borderColor: 'blue',
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: title,
+                }
+            }
+        };
+
+        const encodedConfig = encodeURIComponent(JSON.stringify(chartConfig));
+        const chartUrl = `https://quickchart.io/chart?c=${encodedConfig}`;
+
+        return { chartUrl };
     }
 );
 
@@ -126,7 +150,7 @@ const prompt = ai.definePrompt({
   name: 'virtualTeacherPrompt',
   input: {schema: ChatWithVirtualTeacherInputSchema},
   output: {schema: ChatWithVirtualTeacherOutputSchema},
-  tools: [solveEquationTool, plotDiagramTool],
+  tools: [solveEquationTool, plotDiagramWithQuickChart],
   prompt: `You are a friendly and engaging AI virtual teacher for Iranian high school students. You are teaching in Persian.
 Your expertise is in {{{subject}}}.
 
@@ -137,19 +161,19 @@ Do not solve homework problems directly, but guide the student to the solution.
 
 If the user has provided an image, analyze it in the context of their question. The image could be of their homework, a diagram, or something they need help identifying.
 
-To make your explanations more professional and easier to understand, you MUST use visual aids where appropriate. You can generate tables and simple bar charts.
+To make your explanations more professional and easier to understand, you MUST use visual aids where appropriate. You can generate tables and images of charts.
 - Use tables to compare and contrast concepts, show data, or list steps.
-- Use bar charts to visualize data and relationships. Make sure chart data is simple and clear.
+- Use images for charts and diagrams to visualize data and relationships.
 
 **IMPORTANT CAPABILITIES**:
 - **Equation Solving**: If the student asks you to solve a mathematical equation, you MUST use the \`solveEquation\` tool. The result from the tool should be presented to the user in a text block.
-- **Diagram Plotting**: If the student asks for a diagram or plot of a function, you MUST use the \`plotDiagram\` tool. After calling the tool, you MUST use the \`chartData\` returned by the tool to create a \`chart\` content item in your response. DO NOT just describe the chart in text; you must output the chart object.
+- **Diagram Plotting**: If the student asks for a diagram or plot of a function, you MUST use the \`plotDiagram\` tool. After calling the tool, you MUST use the \`chartUrl\` returned by the tool to create an \`imageUrl\` content item in your response. DO NOT just describe the chart in text; you must output the imageUrl object.
 
 Your response will be an array of content blocks. For example:
 [
   { "type": "text", "content": "Here is an explanation..." },
   { "type": "table", "caption": "Comparison of A and B", "headers": ["Feature", "A", "B"], "rows": [["Speed", "Fast", "Slow"]] },
-  { "type": "chart", "caption": "Plot of y = x^2", "data": [{ "name": "-2", "value": 4 }, { "name": "-1", "value": 1 }, { "name": "0", "value": 0 }] }
+  { "type": "imageUrl", "url": "https://quickchart.io/chart?c=...", "alt": "Plot of y = x^2" }
 ]
 
 Always start with a text block to introduce the topic, then you can follow with other content types like charts or tables.

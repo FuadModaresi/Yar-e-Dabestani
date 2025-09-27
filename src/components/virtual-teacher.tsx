@@ -89,6 +89,19 @@ const renderContent = (item: MessageContent, index: number) => {
                     </CardContent>
                 </Card>
             );
+        case 'imageUrl':
+             return (
+                    <figure key={index} className="my-4">
+                        <Image
+                            src={item.url}
+                            alt={item.alt || 'Generated Chart'}
+                            width={500}
+                            height={300}
+                            className="w-full h-auto rounded-lg shadow-md"
+                        />
+                        {item.alt && <figcaption className="text-center text-sm text-muted-foreground mt-2">{item.alt}</figcaption>}
+                    </figure>
+                );
         default:
             return null;
     }

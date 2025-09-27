@@ -32,6 +32,12 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'quickchart.io',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
