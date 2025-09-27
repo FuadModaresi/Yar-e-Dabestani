@@ -105,14 +105,20 @@ const plotDiagramWithQuickChart = ai.defineTool(
     },
     async ({ func, title }) => {
         console.log(`Plotting function: ${func} with title: ${title}`);
+
+        const expression = func.split('=')[1].trim();
         
         const dataPoints = [];
         const xValues = Array.from({length: 21}, (_, i) => i - 10); // x from -10 to 10
         
         for (const x of xValues) {
             try {
-                // This is a safe-ish eval, but in a real app, a proper math parser is better
-                const y = eval(func.replace(/x/g, `(${x})`).replace('^', '**'));
+                // Simplified and safer expression evaluation
+                let tempExpr = expression.replace(/x/g, `(${x})`);
+                tempExpr = tempExpr.replace(/\^/g, '**');
+                tempExpr = tempExpr.replace(/\|([^|]+)\|/g, (match, content) => `Math.abs(${content})`);
+                
+                const y = new Function('return ' + tempExpr)();
                 dataPoints.push({ x, y });
             } catch (e) {
                 console.error(`Error evaluating function '${func}' for x=${x}:`, e);
@@ -122,7 +128,7 @@ const plotDiagramWithQuickChart = ai.defineTool(
         const chartConfig = {
             type: 'line',
             data: {
-                labels: dataPoints.map(p => p.x),
+                labels: dataPoints.map(p => p.x.toString()),
                 datasets: [{
                     label: func,
                     data: dataPoints.map(p => p.y),
