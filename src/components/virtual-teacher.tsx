@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Bot, Loader2, Send, User, Paperclip, X, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { Bot, Loader2, Send, User, Paperclip, X, Image as ImageIcon, Trash2, ExternalLink } from 'lucide-react';
 import { chatWithVirtualTeacher, ChatWithVirtualTeacherOutput } from '@/ai/flows/virtual-teacher';
 import Image from 'next/image';
 import {
@@ -89,18 +89,14 @@ const renderContent = (item: MessageContent, index: number) => {
                     </CardContent>
                 </Card>
             );
-        case 'imageUrl':
+        case 'link':
              return (
-                    <figure key={index} className="my-4">
-                        <Image
-                            src={item.url}
-                            alt={item.alt || 'Generated Chart'}
-                            width={500}
-                            height={300}
-                            className="w-full h-auto rounded-lg shadow-md"
-                        />
-                        {item.alt && <figcaption className="text-center text-sm text-muted-foreground mt-2">{item.alt}</figcaption>}
-                    </figure>
+                    <Button asChild key={index} className="my-2">
+                        <a href={item.url} target="_blank" rel="noopener noreferrer">
+                            {item.text}
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                        </a>
+                    </Button>
                 );
         default:
             return null;

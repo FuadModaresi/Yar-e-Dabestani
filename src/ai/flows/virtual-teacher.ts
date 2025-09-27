@@ -38,10 +38,10 @@ const ChartContentSchema = z.object({
     data: z.array(z.object({ name: z.string(), value: z.number() })),
 });
 
-const ImageUrlContentSchema = z.object({
-    type: z.enum(['imageUrl']),
+const LinkContentSchema = z.object({
+    type: z.enum(['link']),
     url: z.string().url(),
-    alt: z.string().optional(),
+    text: z.string(),
 });
 
 
@@ -49,12 +49,12 @@ const ContentItemSchema = z.union([
     TextContentSchema,
     TableContentSchema,
     ChartContentSchema,
-    ImageUrlContentSchema,
+    LinkContentSchema,
 ]);
 
 
 const ChatWithVirtualTeacherOutputSchema = z.object({
-  response: z.array(ContentItemSchema).describe("The virtual teacher's response to the student, which can include text, tables, charts, and images."),
+  response: z.array(ContentItemSchema).describe("The virtual teacher's response to the student, which can include text, tables, charts, and links."),
 });
 export type ChatWithVirtualTeacherOutput = z.infer<typeof ChatWithVirtualTeacherOutputSchema>;
 
@@ -90,64 +90,24 @@ const solveEquationTool = ai.defineTool(
   }
 );
 
-// Tool for plotting diagrams using quickchart.io
-const plotDiagramWithQuickChart = ai.defineTool(
+// Tool for plotting diagrams using automeria.io
+const plotWithAutomeria = ai.defineTool(
     {
         name: 'plotDiagram',
-        description: 'Generates a URL for a chart visualizing a mathematical function. Use this to visualize equations.',
+        description: 'Generates a URL to an interactive graph for a mathematical function using Automeria. Use this to visualize equations.',
         inputSchema: z.object({
             func: z.string().describe('The function to plot, e.g., "y = 2x + 1"'),
-            title: z.string().describe('The title for the chart.'),
+            title: z.string().describe('A title for the graph.'),
         }),
         outputSchema: z.object({
-            chartUrl: z.string().url().describe('The URL of the generated chart image.'),
+            graphUrl: z.string().url().describe('The URL of the generated interactive graph.'),
         }),
     },
-    async ({ func, title }) => {
-        console.log(`Plotting function: ${func} with title: ${title}`);
-
-        const expression = func.split('=')[1].trim();
-        
-        const dataPoints = [];
-        const xValues = Array.from({length: 21}, (_, i) => i - 10); // x from -10 to 10
-        
-        for (const x of xValues) {
-            try {
-                // Simplified and safer expression evaluation
-                let tempExpr = expression.replace(/x/g, `(${x})`);
-                tempExpr = tempExpr.replace(/\^/g, '**');
-                tempExpr = tempExpr.replace(/\|([^|]+)\|/g, (match, content) => `Math.abs(${content})`);
-                
-                const y = new Function('return ' + tempExpr)();
-                dataPoints.push({ x, y });
-            } catch (e) {
-                console.error(`Error evaluating function '${func}' for x=${x}:`, e);
-            }
-        }
-        
-        const chartConfig = {
-            type: 'line',
-            data: {
-                labels: dataPoints.map(p => p.x.toString()),
-                datasets: [{
-                    label: func,
-                    data: dataPoints.map(p => p.y),
-                    fill: false,
-                    borderColor: 'blue',
-                }]
-            },
-            options: {
-                title: {
-                    display: true,
-                    text: title,
-                }
-            }
-        };
-
-        const encodedConfig = encodeURIComponent(JSON.stringify(chartConfig));
-        const chartUrl = `https://quickchart.io/chart?c=${encodedConfig}`;
-
-        return { chartUrl };
+    async ({ func }) => {
+        console.log(`Plotting function with Automeria: ${func}`);
+        const encodedFunc = encodeURIComponent(func);
+        const graphUrl = `https://www.automeria.io/graph?q=${encodedFunc}`;
+        return { graphUrl };
     }
 );
 
@@ -156,7 +116,7 @@ const prompt = ai.definePrompt({
   name: 'virtualTeacherPrompt',
   input: {schema: ChatWithVirtualTeacherInputSchema},
   output: {schema: ChatWithVirtualTeacherOutputSchema},
-  tools: [solveEquationTool, plotDiagramWithQuickChart],
+  tools: [solveEquationTool, plotWithAutomeria],
   prompt: `You are a friendly and engaging AI virtual teacher for Iranian high school students. You are teaching in Persian.
 Your expertise is in {{{subject}}}.
 
@@ -167,19 +127,19 @@ Do not solve homework problems directly, but guide the student to the solution.
 
 If the user has provided an image, analyze it in the context of their question. The image could be of their homework, a diagram, or something they need help identifying.
 
-To make your explanations more professional and easier to understand, you MUST use visual aids where appropriate. You can generate tables and images of charts.
+To make your explanations more professional and easier to understand, you MUST use visual aids where appropriate. You can generate tables and links to interactive graphs.
 - Use tables to compare and contrast concepts, show data, or list steps.
-- Use images for charts and diagrams to visualize data and relationships.
+- Use links for graphs and diagrams to visualize data and relationships.
 
 **IMPORTANT CAPABILITIES**:
 - **Equation Solving**: If the student asks you to solve a mathematical equation, you MUST use the \`solveEquation\` tool. The result from the tool should be presented to the user in a text block.
-- **Diagram Plotting**: If the student asks for a diagram or plot of a function, you MUST use the \`plotDiagram\` tool. After calling the tool, you MUST use the \`chartUrl\` returned by the tool to create an \`imageUrl\` content item in your response. DO NOT just describe the chart in text; you must output the imageUrl object.
+- **Diagram Plotting**: If the student asks for a diagram or plot of a function, you MUST use the \`plotDiagram\` tool. After calling the tool, you MUST use the \`graphUrl\` returned by the tool to create a \`link\` content item in your response. The link text should be descriptive, like "نمودار تعاملی برای y = x^2".
 
 Your response will be an array of content blocks. For example:
 [
   { "type": "text", "content": "Here is an explanation..." },
   { "type": "table", "caption": "Comparison of A and B", "headers": ["Feature", "A", "B"], "rows": [["Speed", "Fast", "Slow"]] },
-  { "type": "imageUrl", "url": "https://quickchart.io/chart?c=...", "alt": "Plot of y = x^2" }
+  { "type": "link", "url": "https://www.automeria.io/graph?q=y%3Dx%5E2", "text": "نمودار تعاملی برای y=x^2" }
 ]
 
 Always start with a text block to introduce the topic, then you can follow with other content types like charts or tables.
