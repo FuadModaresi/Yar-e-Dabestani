@@ -90,11 +90,11 @@ const solveEquationTool = ai.defineTool(
   }
 );
 
-// Tool for plotting diagrams using automeria.io
-const plotWithAutomeria = ai.defineTool(
+// Tool for plotting diagrams using desmos.com
+const plotWithDesmos = ai.defineTool(
     {
         name: 'plotDiagram',
-        description: 'Generates a URL to an interactive graph for a mathematical function using Automeria. Use this to visualize equations.',
+        description: 'Generates a URL to an interactive graph for a mathematical function using Desmos. Use this to visualize equations.',
         inputSchema: z.object({
             func: z.string().describe('The function to plot, e.g., "y = 2x + 1"'),
             title: z.string().describe('A title for the graph.'),
@@ -104,9 +104,9 @@ const plotWithAutomeria = ai.defineTool(
         }),
     },
     async ({ func }) => {
-        console.log(`Plotting function with Automeria: ${func}`);
+        console.log(`Plotting function with Desmos: ${func}`);
         const encodedFunc = encodeURIComponent(func);
-        const graphUrl = `https://www.automeria.io/graph?q=${encodedFunc}`;
+        const graphUrl = `https://www.desmos.com/calculator?expression=${encodedFunc}`;
         return { graphUrl };
     }
 );
@@ -116,7 +116,7 @@ const prompt = ai.definePrompt({
   name: 'virtualTeacherPrompt',
   input: {schema: ChatWithVirtualTeacherInputSchema},
   output: {schema: ChatWithVirtualTeacherOutputSchema},
-  tools: [solveEquationTool, plotWithAutomeria],
+  tools: [solveEquationTool, plotWithDesmos],
   prompt: `You are a friendly and engaging AI virtual teacher for Iranian high school students. You are teaching in Persian.
 Your expertise is in {{{subject}}}.
 
@@ -139,7 +139,7 @@ Your response will be an array of content blocks. For example:
 [
   { "type": "text", "content": "Here is an explanation..." },
   { "type": "table", "caption": "Comparison of A and B", "headers": ["Feature", "A", "B"], "rows": [["Speed", "Fast", "Slow"]] },
-  { "type": "link", "url": "https://www.automeria.io/graph?q=y%3Dx%5E2", "text": "نمودار تعاملی برای y=x^2" }
+  { "type": "link", "url": "https://www.desmos.com/calculator?expression=y%3Dx%5E2", "text": "نمودار تعاملی برای y=x^2" }
 ]
 
 Always start with a text block to introduce the topic, then you can follow with other content types like charts or tables.
