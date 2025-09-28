@@ -32,29 +32,22 @@ const TableContentSchema = z.object({
     rows: z.array(z.array(z.string())),
 });
 
-const ChartContentSchema = z.object({
-    type: z.enum(['chart']),
-    caption: z.string().optional(),
-    data: z.array(z.object({ name: z.string(), value: z.number() })),
-});
-
-const LinkContentSchema = z.object({
-    type: z.enum(['link']),
-    url: z.string().url(),
-    text: z.string(),
+const DesmosContentSchema = z.object({
+    type: z.enum(['desmos']),
+    expression: z.string().describe('The mathematical expression to be graphed in Desmos. e.g. "y=x^2"'),
+    title: z.string().optional(),
 });
 
 
 const ContentItemSchema = z.union([
     TextContentSchema,
     TableContentSchema,
-    ChartContentSchema,
-    LinkContentSchema,
+    DesmosContentSchema,
 ]);
 
 
 const ChatWithVirtualTeacherOutputSchema = z.object({
-  response: z.array(ContentItemSchema).describe("The virtual teacher's response to the student, which can include text, tables, charts, and links."),
+  response: z.array(ContentItemSchema).describe("The virtual teacher's response to the student, which can include text, tables, and interactive Desmos graphs."),
 });
 export type ChatWithVirtualTeacherOutput = z.infer<typeof ChatWithVirtualTeacherOutputSchema>;
 
@@ -94,20 +87,19 @@ const solveEquationTool = ai.defineTool(
 const plotWithDesmos = ai.defineTool(
     {
         name: 'plotDiagram',
-        description: 'Generates a URL to an interactive graph for a mathematical function using Desmos. Use this to visualize equations.',
+        description: 'Generates an interactive graph for a mathematical function. Use this to visualize equations.',
         inputSchema: z.object({
-            func: z.string().describe('The function to plot, e.g., "y = 2x + 1"'),
-            title: z.string().describe('A title for the graph.'),
+            expression: z.string().describe('The function to plot, e.g., "y = 2x + 1"'),
+            title: z.string().optional().describe('A title for the graph.'),
         }),
         outputSchema: z.object({
-            graphUrl: z.string().url().describe('The URL of the generated interactive graph.'),
+            expression: z.string(),
+            title: z.string().optional(),
         }),
     },
-    async ({ func }) => {
-        console.log(`Plotting function with Desmos: ${func}`);
-        const encodedFunc = encodeURIComponent(func);
-        const graphUrl = `https://www.desmos.com/calculator?expression=${encodedFunc}`;
-        return { graphUrl };
+    async ({ expression, title }) => {
+        console.log(`Plotting function with Desmos: ${expression}`);
+        return { expression, title };
     }
 );
 
@@ -127,19 +119,19 @@ Do not solve homework problems directly, but guide the student to the solution.
 
 If the user has provided an image, analyze it in the context of their question. The image could be of their homework, a diagram, or something they need help identifying.
 
-To make your explanations more professional and easier to understand, you MUST use visual aids where appropriate. You can generate tables and links to interactive graphs.
+To make your explanations more professional and easier to understand, you MUST use visual aids where appropriate. You can generate tables and interactive graphs.
 - Use tables to compare and contrast concepts, show data, or list steps.
-- Use links for graphs and diagrams to visualize data and relationships.
+- Use Desmos for graphs and diagrams to visualize data and relationships.
 
 **IMPORTANT CAPABILITIES**:
 - **Equation Solving**: If the student asks you to solve a mathematical equation, you MUST use the \`solveEquation\` tool. The result from the tool should be presented to the user in a text block.
-- **Diagram Plotting**: If the student asks for a diagram or plot of a function, you MUST use the \`plotDiagram\` tool. After calling the tool, you MUST use the \`graphUrl\` returned by the tool to create a \`link\` content item in your response. The link text should be descriptive, like "نمودار تعاملی برای y = x^2".
+- **Diagram Plotting**: If the student asks for a diagram or plot of a function, you MUST use the \`plotDiagram\` tool. After calling the tool, you MUST use the \`expression\` and \`title\` returned by the tool to create a \`desmos\` content item in your response.
 
 Your response will be an array of content blocks. For example:
 [
   { "type": "text", "content": "Here is an explanation..." },
   { "type": "table", "caption": "Comparison of A and B", "headers": ["Feature", "A", "B"], "rows": [["Speed", "Fast", "Slow"]] },
-  { "type": "link", "url": "https://www.desmos.com/calculator?expression=y%3Dx%5E2", "text": "نمودار تعاملی برای y=x^2" }
+  { "type": "desmos", "expression": "y=x^2", "title": "نمودار تابع y=x^2" }
 ]
 
 Always start with a text block to introduce the topic, then you can follow with other content types like charts or tables.

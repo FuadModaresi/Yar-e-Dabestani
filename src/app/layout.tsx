@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { GlossaryProvider } from '@/hooks/use-glossary';
 import { UserProvider } from '@/hooks/use-user';
 import MainLayout from '@/components/layout/main-layout';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'یار دبستانی من',
@@ -37,6 +38,7 @@ export default function RootLayout({
             <Toaster />
           </GlossaryProvider>
         </UserProvider>
+        <Script src="https://www.desmos.com/api/v1.11/calculator.js?apiKey=3714ac8791764c0f9bf109c91d74f2b4" />
       </body>
     </html>
   );

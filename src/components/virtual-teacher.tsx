@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Bot, Loader2, Send, User, Paperclip, X, Image as ImageIcon, Trash2, ExternalLink } from 'lucide-react';
+import { Bot, Loader2, Send, User, Paperclip, X, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { chatWithVirtualTeacher, ChatWithVirtualTeacherOutput } from '@/ai/flows/virtual-teacher';
 import Image from 'next/image';
 import {
@@ -17,12 +17,6 @@ import {
   TableCaption,
 } from '@/components/ui/table';
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import {
     AlertDialog,
     AlertDialogAction,
     AlertDialogCancel,
@@ -33,6 +27,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import DesmosGraph from './desmos-graph';
 
 
 type MessageContent = ChatWithVirtualTeacherOutput['response'][number];
@@ -66,38 +61,13 @@ const renderContent = (item: MessageContent, index: number) => {
                     </TableBody>
                 </Table>
             );
-        case 'chart':
-            const chartConfig = item.data.reduce((acc, bar) => {
-                acc[bar.name] = { label: bar.name };
-                return acc;
-            }, {} as any);
+        case 'desmos':
             return (
-                <Card key={index} className="my-4">
-                    <CardHeader>
-                        {item.caption && <CardTitle>{item.caption}</CardTitle>}
-                    </CardHeader>
-                    <CardContent>
-                        <ChartContainer config={chartConfig} className="h-[200px] w-full">
-                            <BarChart accessibilityLayer data={item.data}>
-                                <CartesianGrid vertical={false} />
-                                <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} />
-                                <YAxis />
-                                <ChartTooltip content={<ChartTooltipContent />} />
-                                <Bar dataKey="value" fill="var(--color-primary)" radius={4} />
-                            </BarChart>
-                        </ChartContainer>
-                    </CardContent>
-                </Card>
+                <div key={index} className="my-4">
+                    {item.title && <p className="text-sm font-medium mb-2">{item.title}</p>}
+                    <DesmosGraph expression={item.expression} />
+                </div>
             );
-        case 'link':
-             return (
-                    <Button asChild key={index} className="my-2">
-                        <a href={item.url} target="_blank" rel="noopener noreferrer">
-                            {item.text}
-                            <ExternalLink className="mr-2 h-4 w-4" />
-                        </a>
-                    </Button>
-                );
         default:
             return null;
     }
