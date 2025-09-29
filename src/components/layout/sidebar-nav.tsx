@@ -7,6 +7,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -22,6 +23,11 @@ const subjectIcons = {
 
 export default function SidebarNav() {
   const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    setOpenMobile(false);
+  };
 
   const isActive = (path: string) => {
     return pathname === path || (path !== '/' && pathname.startsWith(path));
@@ -36,6 +42,7 @@ export default function SidebarNav() {
               asChild
               isActive={pathname === '/'}
               tooltip={{ children: 'داشبورد' }}
+              onClick={handleLinkClick}
             >
               <Link href="/">
                 <Home />
@@ -51,6 +58,7 @@ export default function SidebarNav() {
                   asChild
                   isActive={isActive(`/subjects/${subject.id}`)}
                   tooltip={{ children: subject.name }}
+                  onClick={handleLinkClick}
                 >
                   <Link href={`/subjects/${subject.id}`}>
                     <Icon />
@@ -65,6 +73,7 @@ export default function SidebarNav() {
               asChild
               isActive={isActive('/glossary')}
               tooltip={{ children: 'واژه‌نامه' }}
+              onClick={handleLinkClick}
             >
               <Link href="/glossary">
                 <BookCopy />
