@@ -38,7 +38,7 @@ export default function SidebarNav() {
             fill="currentColor"
             className="h-8 w-8 text-primary"
           >
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.5 14.5v-9l6 4.5-6 4.5z"/>
+            <path d="M20 4v16H8V4h12m0-2H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z"/>
           </svg>
           <span className="font-headline text-lg font-bold">یار دبستانی من</span>
         </Link>
