@@ -20,7 +20,6 @@ export default function DesmosGraph({ expression }: DesmosGraphProps) {
     if (window.Desmos && calculatorRef.current && !graphInstanceRef.current) {
         graphInstanceRef.current = window.Desmos.GraphingCalculator(calculatorRef.current, {
             keypad: false,
-            expressions: false,
             settingsMenu: false,
         });
     }
