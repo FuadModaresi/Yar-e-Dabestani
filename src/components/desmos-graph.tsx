@@ -18,10 +18,11 @@ export default function DesmosGraph({ expression }: DesmosGraphProps) {
 
   useEffect(() => {
     if (window.Desmos && calculatorRef.current && !graphInstanceRef.current) {
+        calculatorRef.current.style.direction = 'ltr';
         graphInstanceRef.current = window.Desmos.GraphingCalculator(calculatorRef.current, {
             keypad: false,
             settingsMenu: false,
-            language: 'en', // Set language to English for LTR text direction
+            language: 'en',
         });
     }
 
