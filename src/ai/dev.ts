@@ -1,8 +1,7 @@
 import { config } from 'dotenv';
 config();
 
-// The flows are now imported directly into the API handler
-// in src/app/api/genkit/[...slug]/route.ts
-// This file is still used by `npm run genkit:watch` for development.
-import '@/ai/flows/adaptive-learning-paths.ts';
-import '@/ai/flows/virtual-teacher.ts';
+// The flows are now imported directly into the genkit.ts configuration.
+// This file is still used by `npm run genkit:watch` for local development outside of Next.js,
+// so we need to ensure the main config file is loaded.
+import '@/ai/genkit';
