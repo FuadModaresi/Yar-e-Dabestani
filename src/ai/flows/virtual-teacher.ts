@@ -109,6 +109,7 @@ const prompt = ai.definePrompt({
   input: {schema: ChatWithVirtualTeacherInputSchema},
   output: {schema: ChatWithVirtualTeacherOutputSchema},
   tools: [solveEquationTool, plotWithDesmos],
+  model: 'googleai/gemini-2.5-flash',
   prompt: `You are a friendly and engaging AI virtual teacher for Iranian high school students. You are teaching in Persian.
 Your expertise is in {{{subject}}}.
 
