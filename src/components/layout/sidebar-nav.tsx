@@ -34,6 +34,8 @@ export default function SidebarNav() {
         <Link href="/" className="flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -43,11 +45,11 @@ export default function SidebarNav() {
             className="h-8 w-8 text-primary"
           >
             <path d="M22 10v6M2 10v6" />
-            <path d="M6 12v-2a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v2" />
-            <path d="M6 12h12" />
-            <path d="M12 12v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-6" />
-            <path d="m18 12 4-2-4-2" />
-            <path d="m6 12-4-2 4-2" />
+            <path d="M12 10v12" />
+            <path d="M18.34 10.16 12 6l-6.34 4.16" />
+            <path d="M22 10 12 4 2 10" />
+            <path d="m17 10 3-8-1.5-1-3 8" />
+            <path d="m7 10-3-8 1.5-1 3 8" />
           </svg>
           <span className="font-headline text-lg font-bold">یار دبستانی من</span>
         </Link>
