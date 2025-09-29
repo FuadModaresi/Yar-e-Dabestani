@@ -32,10 +32,22 @@ export default function SidebarNav() {
     <>
       <SidebarHeader className="p-4">
         <Link href="/" className="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className="h-8 w-8 text-primary">
-            <rect width="256" height="256" fill="none" />
-            <path d="M128,24a72,72,0,0,0-72,72c0,30.4,14.8,64.2,42.4,99.8,25.3,32.6,33.8,42.5,29.5,45.9a.8.8,0,0,0,.2,0,7.9,7.9,0,0,0,6.5-3.3c4.9-7.1,10.7-16.3,20-31.5,13.7-22.6,48.4-78.2,48.4-110.9A72,72,0,0,0,128,24Z" opacity="0.2" />
-            <path d="M128,24a72,72,0,0,0-72,72c0,30.4,14.8,64.2,42.4,99.8,25.3,32.6,33.8,42.5,29.5,45.9a.8.8,0,0,0,.2,0,7.9,7.9,0,0,0,6.5-3.3c4.9-7.1,10.7-16.3,20-31.5,13.7-22.6,48.4-78.2,48.4-110.9A72,72,0,0,0,128,24Zm0,104a32,32,0,1,1,32-32A32.1,32.1,0,0,1,128,128Z" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="16" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-8 w-8 text-primary"
+          >
+            <path d="M22 10v6M2 10v6" />
+            <path d="M6 12v-2a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v2" />
+            <path d="M6 12h12" />
+            <path d="M12 12v6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-6" />
+            <path d="m18 12 4-2-4-2" />
+            <path d="m6 12-4-2 4-2" />
           </svg>
           <span className="font-headline text-lg font-bold">یار دبستانی من</span>
         </Link>
