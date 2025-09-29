@@ -3,7 +3,6 @@
 
 import {
   SidebarContent,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
@@ -30,19 +29,6 @@ export default function SidebarNav() {
   
   return (
     <>
-      <SidebarHeader className="p-4">
-        <Link href="/" className="flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="h-8 w-8 text-primary"
-          >
-            <path d="M20 4v16H8V4h12m0-2H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z"/>
-          </svg>
-          <span className="font-headline text-lg font-bold">یار دبستانی من</span>
-        </Link>
-      </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
           <SidebarMenuItem>
