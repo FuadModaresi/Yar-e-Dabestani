@@ -1,12 +1,37 @@
 'use client';
 
+import { useState } from 'react';
 import { useGlossary } from '@/hooks/use-glossary';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookCopy, Trash2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { BookCopy, PlusCircle, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function GlossaryPage() {
-  const { glossary, removeTerm } = useGlossary();
+  const { glossary, addTerm, removeTerm } = useGlossary();
+  const [newTerm, setNewTerm] = useState('');
+  const [newDefinition, setNewDefinition] = useState('');
+  const { toast } = useToast();
+
+  const handleAddTerm = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newTerm.trim() && newDefinition.trim()) {
+      addTerm({
+        term: newTerm,
+        definition: newDefinition,
+        context: 'افزوده شده توسط کاربر',
+      });
+      setNewTerm('');
+      setNewDefinition('');
+      toast({
+        title: 'اصطلاح اضافه شد',
+        description: `اصطلاح "${newTerm}" با موفقیت به واژه‌نامه شما اضافه شد.`,
+      });
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -21,6 +46,48 @@ export default function GlossaryPage() {
             </p>
         </div>
       </div>
+      
+      <Card>
+        <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+                <PlusCircle />
+                افزودن اصطلاح جدید
+            </CardTitle>
+            <CardDescription>
+                یک اصطلاح و تعریف جدید به واژه‌نامه شخصی خود اضافه کنید.
+            </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleAddTerm}>
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="term">اصطلاح</Label>
+                    <Input 
+                        id="term" 
+                        placeholder="مثلاً: اینرسی" 
+                        value={newTerm}
+                        onChange={(e) => setNewTerm(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="definition">تعریف</Label>
+                    <Textarea 
+                        id="definition" 
+                        placeholder="تعریف اصطلاح را اینجا بنویسید..."
+                        value={newDefinition}
+                        onChange={(e) => setNewDefinition(e.target.value)}
+                        required
+                    />
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button type="submit">
+                    ذخیره اصطلاح
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                </Button>
+            </CardFooter>
+        </form>
+      </Card>
 
       {glossary.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -52,7 +119,7 @@ export default function GlossaryPage() {
             <BookCopy className="w-16 h-16 text-muted-foreground/50 mb-4" />
             <h3 className="text-xl font-semibold">واژه‌نامه شما خالی است</h3>
             <p className="text-muted-foreground mt-2">
-                اصطلاحات را از درس‌ها اضافه کنید تا در اینجا ظاهر شوند.
+                اصطلاحات را از درس‌ها یا فرم بالا اضافه کنید تا در اینجا ظاهر شوند.
             </p>
         </div>
       )}
