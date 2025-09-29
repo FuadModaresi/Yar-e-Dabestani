@@ -21,6 +21,7 @@ export default function DesmosGraph({ expression }: DesmosGraphProps) {
         graphInstanceRef.current = window.Desmos.GraphingCalculator(calculatorRef.current, {
             keypad: false,
             settingsMenu: false,
+            language: 'en', // Set language to English for LTR text direction
         });
     }
 
