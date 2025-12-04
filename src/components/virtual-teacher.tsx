@@ -129,7 +129,8 @@ export default function VirtualTeacher({ subject }: { subject: { id: string; nam
     if (!input.trim() && !imageFile) return;
 
     const userMessage: Message = { role: 'user', content: input, image: imagePreview || undefined };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     
     const messageToSend = input;
     const imageToSend = imagePreview;
@@ -142,9 +143,21 @@ export default function VirtualTeacher({ subject }: { subject: { id: string; nam
     setIsLoading(true);
 
     try {
+      const history = newMessages
+        .slice(0, -1) // Exclude the current message
+        .map((msg) => ({
+          role: msg.role,
+          content: msg.richContent 
+            ? msg.richContent.filter(c => c.type === 'text').map(c => (c as {content: string}).content).join(' ')
+            : msg.content,
+        }))
+        .filter(msg => msg.content);
+
+
       const result = await chatWithVirtualTeacher({
         subject: subject.name,
         message: messageToSend,
+        history: history,
         imageDataUri: imageToSend || undefined,
       });
       const botMessage: Message = { role: 'bot', content: '', richContent: result.response };

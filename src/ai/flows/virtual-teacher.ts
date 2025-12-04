@@ -11,9 +11,15 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+const HistoryMessageSchema = z.object({
+  role: z.enum(['user', 'bot']),
+  content: z.string(),
+});
+
 const ChatWithVirtualTeacherInputSchema = z.object({
   subject: z.string().describe('The subject the student wants to discuss (e.g., physics, math, chemistry, biology).'),
   message: z.string().describe("The student's message to the virtual teacher."),
+  history: z.array(HistoryMessageSchema).optional().describe('The previous conversation history.'),
   imageDataUri: z.string().optional().describe(
     "An optional image sent by the student, as a data URI. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
   ),
@@ -137,7 +143,19 @@ Your response will be an array of content blocks. For example:
 
 Always start with a text block to introduce the topic, then you can follow with other content types like charts or tables.
 
-Student's message:
+{{#if history}}
+This is the conversation history. Use it to provide contextual answers.
+{{#each history}}
+{{#if (eq this.role 'bot')}}
+MODEL: {{{this.content}}}
+{{else}}
+USER: {{{this.content}}}
+{{/if}}
+{{/each}}
+{{/if}}
+
+
+Student's current message:
 "{{{message}}}"
 
 {{#if imageDataUri}}
