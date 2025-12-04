@@ -1,0 +1,13 @@
+diff --git a/node_modules/genkit/lib/flow.js b/node_modules/genkit/lib/flow.js
+index 9b93563..f79e27c 100644
+--- a/node_modules/genkit/lib/flow.js
++++ b/node_modules/genkit/lib/flow.js
+@@ -342,7 +342,10 @@
+                     toolRequest.input = input;
+                 }
+                 else {
+-                    toolRequest.input = await (0, exports.runInNewSpan)('deserialize-arguments', {}, async () => JSON.parse(args));
++                    toolRequest.input = await (0, exports.runInNewSpan)('deserialize-arguments', {}, async () => (typeof args === 'string' ? JSON.parse(args) : args));
+                 }
+                 const output = await (0, exports.runInNewSpan)('call-tool', {
+                     name: tool.info.name,

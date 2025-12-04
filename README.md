@@ -13,6 +13,22 @@ The application is built with a modern tech stack, leveraging the power of Next.
 -   **Subject-Based Curriculum**: The app is neatly organized by subjects, providing a clear structure for students to navigate through lessons and learning materials.
 -   **Progressive Web App (PWA)**: The application is fully PWA-enabled, allowing for installation on mobile devices and offline access to learning content.
 
+## 📚 Subjects
+
+The platform provides dedicated learning modules for core high school science and mathematics subjects. Each section is designed to build a strong foundation and is supported by a specialized AI tutor.
+
+-   ### 📐 **Math (ریاضی)**
+    This section focuses on building a strong foundation in key mathematical concepts. The AI tutor helps demystify complex topics in algebra, calculus, and geometry, offering step-by-step guidance and visualizing functions with interactive graphs. It's designed to help students build problem-solving skills and prepare for university entrance exams.
+
+-   ### ⚛️ **Physics (فیزیک)**
+    Explore the fundamental principles of the universe, from classical mechanics to modern physics. The AI tutor assists in breaking down complex laws and theories, making abstract concepts more tangible with real-world examples and clear explanations.
+
+-   ### 🧪 **Chemistry (شیمی)**
+    Dive into the world of atoms, molecules, and chemical reactions. This module covers everything from the periodic table to organic chemistry. The AI tutor can help you balance chemical equations, understand reaction mechanisms, and learn the properties of different substances.
+
+-   ### 🧬 **Biology (زیست شناسی)**
+    Uncover the wonders of the living world. This section covers topics from cellular biology and genetics to ecology and human anatomy. The AI tutor helps students visualize complex biological processes and understand the intricate systems that govern life.
+
 ## 🚀 Tech Stack
 
 -   **Framework**: [Next.js](https://nextjs.org/) (App Router)
