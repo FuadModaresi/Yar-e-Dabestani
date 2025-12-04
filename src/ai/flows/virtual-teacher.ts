@@ -146,9 +146,10 @@ Always start with a text block to introduce the topic, then you can follow with 
 {{#if history}}
 This is the conversation history. Use it to provide contextual answers.
 {{#each history}}
-{{#if (eq this.role 'bot')}}
+{{#if isBot}}
 MODEL: {{{this.content}}}
-{{else}}
+{{/if}}
+{{#if isUser}}
 USER: {{{this.content}}}
 {{/if}}
 {{/each}}
@@ -194,7 +195,13 @@ const virtualTeacherFlow = ai.defineFlow(
     outputSchema: ChatWithVirtualTeacherOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const historyWithRoles = input.history?.map(msg => ({
+      ...msg,
+      isUser: msg.role === 'user',
+      isBot: msg.role === 'bot',
+    }));
+
+    const {output} = await prompt({ ...input, history: historyWithRoles });
     return output!;
   }
 );
