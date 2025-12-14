@@ -7,7 +7,6 @@ import { Button } from './ui/button';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { Label } from './ui/label';
 import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
-import { AdaptiveLearningDialog } from './adaptive-learning-dialog';
 
 interface QuizProps {
   lesson: Lesson;
@@ -21,7 +20,6 @@ export default function Quiz({ lesson, subject }: QuizProps) {
   const [answers, setAnswers] = useState<AnswersState>({});
   const [results, setResults] = useState<ResultsState | null>(null);
   const [showResults, setShowResults] = useState(false);
-  const [isDialogOpen, setDialogOpen] = useState(false);
 
   const handleValueChange = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
@@ -41,16 +39,8 @@ export default function Quiz({ lesson, subject }: QuizProps) {
 
     setResults(newResults);
     setShowResults(true);
-    setDialogOpen(true);
   };
   
-  const getStudentResponsesText = () => {
-    return lesson.quiz.map(q => {
-        const selectedOption = q.options.find(opt => opt.id === answers[q.id]);
-        return `سوال: "${q.text}" - پاسخ دانش آموز: "${selectedOption?.text || 'پاسخ نداده'}"`;
-    });
-  }
-
   const resetQuiz = () => {
     setAnswers({});
     setResults(null);
@@ -113,17 +103,10 @@ export default function Quiz({ lesson, subject }: QuizProps) {
       </Card>
 
       {showResults && (
-        <AdaptiveLearningDialog
-          open={isDialogOpen}
-          onOpenChange={setDialogOpen}
-          input={{
-            lessonContent: lesson.content.filter(c => c.type === 'p' || c.type === 'h2' || c.type === 'h3').map(c => c.content).join('\n'),
-            studentResponses: getStudentResponsesText(),
-            studentPreviousPerformance: 75, // Mock data
-            schoolType: "دبیرستان دولتی", // Mock data
-            topic: subject.name,
-          }}
-        />
+        <div className="mt-4 p-4 border rounded-md">
+            <h3 className="font-bold">نتایج آزمون</h3>
+            <p>ویژگی یادگیری تطبیقی به زودی اضافه خواهد شد.</p>
+        </div>
       )}
     </>
   );
